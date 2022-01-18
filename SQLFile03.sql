@@ -85,9 +85,53 @@ having sum(frigorificos.precio) > 1500;
 
 /* 10  Mostrar la marca y el modelo de los frigoríficos que no están en ninguna tienda.*/
 select marca , modelo from frigorificos where idtienda is null;
+select marca , modelo from frigorificos where not exists (select null from tienda where tienda.istienda = frigorificos.idtienda);
+
+/* 11 Mostrar la marca, el modelo, el precio y una nueva columna con un 10% sobre el precio a la que llamaremos descuento de los frigoríficos de altura superior a 170 y un precio menor de 800€.*/
+select marca , modelo ,precio , precio-(precio*0.1) as "Descuento frigorifico 10%" from frigorificos where altura > 170 and precio < 800;
+
+/* 12 Marca y modelo del frigorífico de mayor capacidad.*/
+select marca , modelo 
+from frigorificos  
+where capacidad =(
+select max(capacidad) 
+from frigorificos );
+
+/* 13 Marca y modelos de los frigoríficos que tienen una capacidad superior al frigorífico de mayor capacidad de la marca AEG.*/
+select marca , modelo 
+from frigorificos
+where capacidad > (select max(capacidad) 
+from frigorificos where marca like "AEG");
+
+/*14  Qué precio tiene el frigorífico con más capacidad que no es de color blanco ni de la marca AEG.*/
+select precio
+from frigorificos
+where capacidad in( select max(capacidad) 
+from frigorificos
+where color <>("Blanco") and marca <> "AEG");
 
 
+/*15 Crea una vista con todos los frigoríficos de las tiendas de Madrid. 
+La vista mostrará el nombre de la tienda y todos los datos del frigorífico.
+La vista se llamará Vistatiendamadrid. */
 
+/*select *
+from frigorificos 
+where idtienda in (select idtienda from tienda where ciudad like "Madrid");
+*/
+create view Vistatiendamadrid as 
+select frigorificos.* ,tienda.nombre 
+from frigorificos 
+right outer join tienda on frigorificos.idtienda = tienda.idtienda where ciudad like "Madrid";
 
+/* comprobar Vistatiendamadrid */
+select * from Vistatiendamadrid;
 
+/* 16 Empieza una transacción con la instrucción BEGIN. 
+Incrementa 50 € el precio de todos los frigoríficos de la marca Haier. 
+Ejecuta un ROLLBACK. ¿Qué ha sucedido?*/
+
+begin;
+update frigorificos SET precio = (precio +50) where marca like "Haier";
+select precio from frigorificos;
 
