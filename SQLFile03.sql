@@ -115,10 +115,6 @@ where color <>("Blanco") and marca <> "AEG");
 La vista mostrará el nombre de la tienda y todos los datos del frigorífico.
 La vista se llamará Vistatiendamadrid. */
 
-/*select *
-from frigorificos 
-where idtienda in (select idtienda from tienda where ciudad like "Madrid");
-*/
 create view Vistatiendamadrid as 
 select frigorificos.* ,tienda.nombre 
 from frigorificos 
@@ -130,8 +126,20 @@ select * from Vistatiendamadrid;
 /* 16 Empieza una transacción con la instrucción BEGIN. 
 Incrementa 50 € el precio de todos los frigoríficos de la marca Haier. 
 Ejecuta un ROLLBACK. ¿Qué ha sucedido?*/
-
 begin;
 update frigorificos SET precio = (precio +50) where marca like "Haier";
-select precio from frigorificos;
+rollback;
+
+select precio from frigorificos where marca like "Haier";
+
+
+/*.17 Empieza una transacción con la instrucción BEGIN. 
+Incrementa 50€ el precio de todos los frigoríficos de la marca AEG.
+ Ejecuta un COMMIT. ¿Qué ha sucedido?  */
+
+begin;
+update frigorificos SET precio = (precio +50) where marca like "AEG";
+commit;
+
+select precio from frigorificos where marca like "AEG";
 
